@@ -42,7 +42,7 @@ public class JPAMappingsTest {
 		entityManager.clear();
 		
 		Optional<Topic> result = topicRepo.findById(topicId);
-		result.get();
+		topic = result.get();
 		assertThat(topic.getName(), is("topic"));
 	}
 	
@@ -67,7 +67,7 @@ public class JPAMappingsTest {
 		entityManager.clear();
 		
 		Optional<Course> result = courseRepo.findById(courseId);
-		result.get();
+		course = result.get();
 		assertThat(course.getName(), is("course name"));
 	}
 	
