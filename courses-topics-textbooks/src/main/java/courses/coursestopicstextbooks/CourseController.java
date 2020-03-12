@@ -19,9 +19,8 @@ public class CourseController {
 	TopicRepository topicRepo;
 	
 	@RequestMapping("/course")
-	public String findOneCourse(@RequestParam(value="id")long id, Model model) throws CourseNotFoundException{
+	public String findOneCourse(@RequestParam(value = "id") long id, Model model) throws CourseNotFoundException {
 		Optional<Course> course = courseRepo.findById(id);
-		
 		if(course.isPresent()) {
 			model.addAttribute("courses", course.get());
 			return "course";
@@ -36,22 +35,66 @@ public class CourseController {
 	}
 
 	@RequestMapping("/topic")
-	public String findOneTopic(@RequestParam(value="id")long id, Model model) throws TopicNotFoundException {
-Optional<Topic> topic = topicRepo.findById(id);
+	public String findOneTopic(@RequestParam(value = "id") long id, Model model) throws TopicNotFoundException {
+        Optional<Topic> topic = topicRepo.findById(id);
 		
 		if(topic.isPresent()) {
 			model.addAttribute("topics", topic.get());
+			model.addAttribute("courses", courseRepo.findByTopicsContains(topic.get()));
 			return "topic";
 		}
 		throw new TopicNotFoundException();
 		
 	}
 
-	@RequestMapping("/show-topics")
+	@RequestMapping("/topics")
 	public String findAllTopics(Model model) {
 		model.addAttribute("topics", topicRepo.findAll());
 		return ("topics");
 		
 	}
+    @RequestMapping("/add-course")
+	public String addCourse(String courseName, String courseDescription, String topicName) {
+		Topic topic = topicRepo.findByName(topicName);
+    	Course newCourse = courseRepo.findByName(courseName);
+    	
+		if(newCourse==null) {
+			newCourse = new Course(courseName, courseDescription, topic);
+			courseRepo.save(newCourse);
+		}
+		return "redirect:/show-courses";
+		
+	}
+    @RequestMapping("/delete-course")
+	public String deleteCourseByName(String courseName) {
+	
+    	if(courseRepo.findByName(courseName) != null) {
+    		Course deletedCourse = courseRepo.findByName(courseName);
+    		courseRepo.delete(deletedCourse);
+    	}
+    	
+		return "redirect:/show-courses";
+	}
+    
+    @RequestMapping("/del-course")
+	public String deleteCourseById(Long courseId) {
+		
+    	courseRepo.deleteById(courseId);
+    	
+		return "redirect:/show-courses";
+	}
 
+    @RequestMapping("/find-by-topic")
+    public String findCoursesByTopic(String topicName, Model model) {
+    	Topic topic = topicRepo.findByName(topicName);
+    	model.addAttribute("courses", courseRepo.findByTopicsContains(topic));
+		return "/topic";
+    }
+    
+    @RequestMapping("/sort-courses")
+    public String sortCourses(Model model) {
+    	model.addAttribute("courses", courseRepo.findAllByOrderByNameAsc());
+    	
+    	return "courses";
+    }
 }

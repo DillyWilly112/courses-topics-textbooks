@@ -32,6 +32,10 @@ public class Topic {
 	public Topic(String name) {
 		this.name = name;
 	}
+	
+	public Collection<Course> getCourses() {
+		return courses;
+	}
 
 	@Override
 	public int hashCode() {
@@ -55,9 +59,6 @@ public class Topic {
 		return true;
 	}
 
-	public Collection<Course> getCourses() {
-		return courses;
-	}
 	
 	
 }
